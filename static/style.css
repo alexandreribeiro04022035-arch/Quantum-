@@ -1,0 +1,18 @@
+.btn-link {
+    display: block;
+    width: 90%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid gold;
+    background: #111;
+    color: gold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-link:hover {
+    background: gold;
+    color: black;
+}
