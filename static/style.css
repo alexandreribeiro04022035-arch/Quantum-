@@ -1,3 +1,71 @@
+
+
+        body {
+            background: #000;
+            color: gold;
+            font-family: Arial;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .caixa {
+            border: 1px solid gold;
+            padding: 15px;
+            border-radius: 10px;
+            width: 330px;
+            margin: auto;
+            background: #111;
+            box-shadow: 0 0 12px gold;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+            border-radius: 6px;
+            border: 1px solid gold;
+            background: #000;
+            color: gold;
+        }
+
+        button {
+            width: 90%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid gold;
+            background: #111;
+            color: gold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: gold;
+            color: black;
+        }
+
+        .invisivel {
+            display: none;
+        }
+
+        .titulo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 12px gold;
+        }
+
+        .descri {
+            margin-top: 35px;
+            font-size: 14px;
+            color: gold;
+        }
+
+
+
+
+
+
 .btn-link {
     display: block;
     width: 90%;
