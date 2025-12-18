@@ -1,82 +1,120 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import json
 import os
+
 from openai import OpenAI
-#chama o gerar py
+
+# funções externas
 from gerar_json import gerar_json
 from gerar_cache import gerar_cache
 
 app = Flask(__name__)
 
-# OpenAI
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# =========================
+# CONFIG
+# =========================
+OPENAI_KEY = os.getenv("OPENAI_API_KEY")
+CACHE_KEY = os.getenv("CACHE_KEY", "123")
+
+client = OpenAI(api_key=OPENAI_KEY)
 
 # =========================
-# INDEX
+# INDEX / PAGES (NÃO MEXI)
 # =========================
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# =========================
-# LOGIN PAGE
-# =========================
 @app.route("/login")
 def login():
     return render_template("login.html")
 
-# =========================
-# qwriter 
-
 @app.route("/qwriter")
 def qwriter():
-    return send_from_directory("static","qwriter.html")
+    return send_from_directory("static", "qwriter.html")
+
+@app.route("/escritor")
+def escritor():
+    return send_from_directory("static", "escritor.html")
 
 @app.route("/writejson")
 def writejson():
-    return send_from_directory("cache","writejson.html")
-    
-
-@app.route("/escritor")
-def  escritor():
-    return  send_from_directory("static", "escritor.html")
-
+    return send_from_directory("cache", "writejson.html")
 
 # =========================
-# IA
+# GERAR CACHE (PROTEGIDO)
+# =========================
+@app.route("/gerar-cache")
+def gerar_cache_route():
+    key = request.args.get("key")
+
+    if key != CACHE_KEY:
+        return jsonify({"erro": "forbidden"}), 403
+
+    try:
+        total = gerar_cache()
+        return jsonify({
+            "status": "ok",
+            "registros": total
+        })
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+# =========================
+# GERAR JSON (PROTEGIDO)
+# =========================
+@app.route("/gerar-json")
+def gerar_json_route():
+    key = request.args.get("key")
+
+    if key != CACHE_KEY:
+        return jsonify({"erro": "forbidden"}), 403
+
+    try:
+        gerar_json()
+        return jsonify({
+            "status": "ok",
+            "msg": "banco.json atualizado"
+        })
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+# =========================
+# IA (CORRIGIDA)
 # =========================
 @app.route("/ia", methods=["POST"])
 def ia():
-    user_text = request.json.get("texto", "")
-
     cache_path = "cache/banco.json"
 
     if not os.path.exists(cache_path):
-        return jsonify({"erro": "static não existe"}), 400
+        return jsonify({"erro": "cache/banco.json não existe"}), 400
 
     with open(cache_path, "r", encoding="utf-8") as f:
         banco = json.load(f)
 
+    user_text = request.json.get("texto", "")
+
     contexto = f"""
-Tu és IA do sistema Quantum .
-Dados:
+Tu és a IA do sistema Quantum.
+Usa EXCLUSIVAMENTE os dados abaixo.
+Dados da tabela banco:
 {banco}
 """
 
-    resposta = client.chat.completions.create(
+    response = client.responses.create(
         model="gpt-4.1-mini",
-        messages=[
+        input=[
             {"role": "system", "content": contexto},
             {"role": "user", "content": user_text}
         ]
     )
 
     return jsonify({
-        "resposta": resposta.choices[0].message.content
+        "resposta": response.output_text
     })
 
-
+# =========================
+# START
+# =========================
 if __name__ == "__main__":
     app.run()
