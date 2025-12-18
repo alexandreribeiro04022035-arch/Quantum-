@@ -82,7 +82,7 @@ button:hover {
 <script>
 // ===== NÃO MUDA NOME DAS VARIÁVEIS =====
 const REPO = "alexandreribeiro04022035-arch/Quantum-";
-const FILE_PATH = "cache/banco.json";
+const FILE_PATH = "banco.json";
 const TOKEN = "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";
 const JSON_URL = "https://api.github.com/repos/" + REPO + "/contents/" + FILE_PATH;
 
@@ -230,7 +230,7 @@ async function gerar() {
     mostrarStatus("💾 Escrevendo no banco.json...", "loading");
     
     const body = {
-      message: "update cache/banco.json",
+      message: "update banco.json",
       content: btoa(unescape(encodeURIComponent(JSON.stringify(dadosCompletos, null, 2)))),
       sha: fileData.sha
     };
