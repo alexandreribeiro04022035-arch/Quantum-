@@ -23,7 +23,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-def gerar_json(email):
+def gerarjson(email):
     url = f"{SUPABASE_URL}/rest/v1/{TABLE}?select=*&email=eq.{email}"
 
     r = requests.get(url, headers=headers)
@@ -42,4 +42,4 @@ def gerar_json(email):
 
 if __name__ == "__main__":
     # Chama com email exemplo (teste)
-    gerar_json("email@exemplo.com")
+    gerarjson("email@exemplo.com")
