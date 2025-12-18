@@ -41,5 +41,14 @@ def ia():
         "resposta": resposta.choices[0].message.content
     })
 
+from gerar_json import gerar_json
+
+@app.route("/gerar-json", methods=["GET"])
+def rota_gerar_json():
+    gerar_json()
+    return {"status": "ok"}
+
+
+
 if __name__ == "__main__":
     app.run()
