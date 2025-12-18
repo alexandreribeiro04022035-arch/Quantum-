@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum JSON Writer</title>
+
+<style>
+body{
+  background:#000;
+  color:gold;
+  font-family:Arial;
+  padding:20px;
+}
+#dados{
+  white-space:pre-wrap;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Quantum IA</h2>
+<div id="dados"></div>
+
+<script>
+// ===== NÃO MUDA NOME DAS VARIÁVEIS =====
+const REPO = "alexandreribeiro04022035-arch/Quantum-";
+const FILE_PATH = "cache/banco.json";
+const TOKEN = "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";
+const JSON_URL = "https://api.github.com/repos/" + REPO + "/contents/" + FILE_PATH;
+
+// ===== SUPABASE (igual antes) =====
+const SUPABASE_URL = "https://lpkhscatjrllfscqmxka.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxwa2hzY2F0anJsbGZzY3FteGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzU3MjYsImV4cCI6MjA3OTE1MTcyNn0.HlNIZFU2kq2-pyq0PgBxFX1Kg1iKldF_Y3thWKzYBnM";
+
+async function gerar(){
+
+  const email = localStorage.getItem("quantum_user_email");
+  const senha = localStorage.getItem("quantum_user_senha");
+
+  if(!email || !senha){
+    document.getElementById("dados").textContent = "Login não encontrado";
+    return;
+  }
+
+  // ===== BUSCA NA TABELA =====
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/banco?email=eq.${encodeURIComponent(email)}`,
+    {
+      headers:{
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  const data = await r.json();
+  if(!data.length || data[0].senha !== senha){
+    document.getElementById("dados").textContent = "Credenciais inválidas";
+    return;
+  }
+
+  const usuario = data[0];
+  document.getElementById("dados").textContent = JSON.stringify(usuario, null, 2);
+
+  // ===== GITHUB GET =====
+  const getFile = await fetch(JSON_URL,{
+    headers:{ "Authorization":"Bearer " + TOKEN }
+  });
+  const fileData = await getFile.json();
+
+  // ===== GITHUB PUT =====
+  const body = {
+    message: "update cache/banco.json",
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(usuario, null, 2)))),
+    sha: fileData.sha
+  };
+
+  await fetch(JSON_URL,{
+    method:"PUT",
+    headers:{
+      "Authorization":"Bearer " + TOKEN,
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify(body)
+  });
+}
+
+gerar();
+</script>
+
+</body>
+</html>
