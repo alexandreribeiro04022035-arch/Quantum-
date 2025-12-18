@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 import json
 import os
 from openai import OpenAI
-from gerar_json import gerar_json
+from qwriter import qwriter
 
 app = Flask(__name__)
 
