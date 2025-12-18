@@ -1,0 +1,52 @@
+[
+  {
+    "id": 0,
+    "nome": "",
+    "cpf": "",
+    "email": "",
+    "telefone": "",
+    "senha": "",
+    "chavepix": "",
+    "poupanca": 0,
+    "depositar": 0,
+    "sacar": 0,
+    "mensagem": "",
+    "saldo": 0,
+    "extratoconta": 0,
+    "datadinicio": null,
+
+    "cdb": "",
+    "aplicar": 0,
+    "resgatar": 0,
+    "prazo": 0,
+    "carencia": 30,
+    "juros": 0.13,
+    "rendimento": 0,
+    "lucro": 0,
+    "extratocdb": 0,
+    "datainiciocdb": null,
+
+    "ipo": 50000000,
+    "followon": 0,
+    "valorunidade": 0.10,
+    "tipo": "",
+    "comprar": 0,
+    "vender": 0,
+    "cota": 0,
+    "capital": 0,
+    "montante": 0,
+    "extratoacao": 0,
+    "alavanca": 0,
+    "datainicioacao": null,
+
+    "limite": 0,
+    "cartao": "",
+    "credito": 0,
+    "debito": 0,
+    "fatura": 0,
+    "extratocartao": 0,
+    "datainiciocartao": null,
+
+    "hitorico": ""
+  }
+]
