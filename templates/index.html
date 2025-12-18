@@ -1,62 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Invest</title>
-    <link rel="stylesheet" href="static/style.css">
+<meta charset="UTF-8">
+<title>Quantum IA</title>
 </head>
 <body>
 
-    <div class="titulo">Quantum Invest</div>
+<h2>Comando para IA</h2>
 
-    <!-- LOGIN -->
-    <div id="divLogin" class="caixa">
-        <input id="emailLogin" placeholder="Email">
-        <input id="senhaLogin" type="password" placeholder="Senha">
+<textarea id="cmd" rows="6" cols="50"></textarea><br><br>
+<button onclick="enviar()">Enviar</button>
 
-        <a href="login.html" class="btn-link">Entrar</a>
-        <a href="cadastro.html" class="btn-link">Cadastrar</a>
-        <a href="limpar.html" class="btn-link">Limpar campos</a>
-        <a href="ajuda.html" class="btn-link">Ajuda (Robô)</a>
-    </div>
+<pre id="resp"></pre>
 
-    <!-- PAINEL PRINCIPAL APÓS LOGIN -->
-    <div id="divPainel" class="invisivel">
-        <h2>Painel do Investidor</h2>
+<script>
+async function enviar() {
+  const texto = document.getElementById("cmd").value;
 
-        <!-- BOTÕES QUE APONTAM PARA HTMLs -->
-        <a href="depositar.html" class="btn-link">Depositar</a>
-        <a href="sacar.html" class="btn-link">Sacar</a>
-        <a href="aplicar.html" class="btn-link">Aplicar CDB</a>
-        <a href="resgatar.html" class="btn-link">Resgatar CDB</a>
-        <a href="comprar.html" class="btn-link">Comprar Ações</a>
-        <a href="vender.html" class="btn-link">Vender Ações</a>
+  const r = await fetch("/ia", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texto })
+  });
 
-        <br><br>
+  const data = await r.json();
+  document.getElementById("resp").textContent = data.resposta;
+}
+</script>
 
-        <!-- BOTÕES DE EXTRATOS -->
-        <a href="extrato_conta.html" class="btn-link">Extrato Conta</a>
-        <a href="extrato_cdb.html" class="btn-link">Extrato CDB</a>
-        <a href="extrato_acao.html" class="btn-link">Extrato Ação</a>
-        <a href="historico.html" class="btn-link">Histórico</a>
-    </div>
-
-    <!-- DESCRIÇÃO FIXA -->
-    <div class="descri">
-        <b>Quantum Invest</b><br>
-        Desenvolvido com IA — o futuro é agora!<br><br>
-
-        Contato:<br>
-        zozimofreitas3@gmail.com<br>
-        fakegab01@gmail.com<br>
-        WhatsApp: 21 99910-2951<br><br>
-
-        Quem somos? Fintech Quantum Invest<br><br>
-
-        © Alexandre Ribeiro, André Bonotto, ChatGPT5, DeepSeek, Gemini Google
-    </div>
-
-    <script src="static/script.js"></script>
 </body>
 </html>
