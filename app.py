@@ -26,11 +26,11 @@ def login():
     return render_template("login.html")
 
 # =========================
-# GERAR CACHE
+# qwriter 
 # =========================
 @app.route("/qwriter")
 def qwriter():
-    return send_from_directory(".", "qwriter.html")
+    return render_static("qwriter.html")
 
 
 
