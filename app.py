@@ -30,7 +30,7 @@ def login():
 # =========================
 @app.route("/qwriter")
 def qwriter():
-    return render_static("qwriter.html")
+    return send_from_directory("static","qwriter.html")
 
 
 
