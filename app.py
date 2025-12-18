@@ -46,10 +46,10 @@ def  gerarjson():
 def ia():
     user_text = request.json.get("texto", "")
 
-    cache_path = "cache/banco.json"
+    cache_path = "static/banco.json"
 
     if not os.path.exists(cache_path):
-        return jsonify({"erro": "cache não existe"}), 400
+        return jsonify({"erro": "static não existe"}), 400
 
     with open(cache_path, "r", encoding="utf-8") as f:
         banco = json.load(f)
