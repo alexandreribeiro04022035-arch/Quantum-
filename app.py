@@ -34,7 +34,7 @@ def qwriter():
 
 
 
-@app.route("/gerarjson", methods=["GET", "POST"])
+@app.route("/gerarjson")
 def  gerarjson():
     return  send_from_directory("static", "gerarjson.html")
 
