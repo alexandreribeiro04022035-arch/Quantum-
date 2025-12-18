@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Quantum Invest</title>
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    color: gold;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .caixa {
+    border: 1px solid gold;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 330px;
+    background: #111;
+    box-shadow: 0 0 12px gold;
+  }
+  
+  input, button {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid gold;
+    background: #000;
+    color: gold;
+    font-size: 16px;
+  }
+  
+  button {
+    background: #111;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background: gold;
+    color: black;
+  }
+  
+  .titulo {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-shadow: 0 0 12px gold;
+  }
+  
+  #mensagem {
+    margin-top: 15px;
+    min-height: 24px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="titulo">Quantum Invest</div>
+
+<div class="caixa">
+  <input id="emailLogin" placeholder="Email" type="email">
+  <input id="senhaLogin" type="password" placeholder="Senha">
+  
+  <button id="btnEntrar">Entrar</button>
+  <button id="btnLimpar">Limpar</button>
+  
+  <div id="mensagem"></div>
+</div>
+
+<script>
+  // SUPABASE
+  const SUPABASE_URL = 'https://lpkhscatjrllfscqmxka.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxwa2hzY2F0anJsbGZzY3FteGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzU3MjYsImV4cCI6MjA3OTE1MTcyNn0.HlNIZFU2kq2-pyq0PgBxFX1Kg1iKldF_Y3thWKzYBnM';
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnEntrar').addEventListener('click', fazerLogin);
+    document.getElementById('btnLimpar').addEventListener('click', limparCampos);
+  });
+  
+  async function fazerLogin() {
+    const email = document.getElementById('emailLogin').value.trim();
+    const senha = document.getElementById('senhaLogin').value.trim();
+    const msgDiv = document.getElementById('mensagem');
+    
+    if (!email || !senha) {
+      mostrarMensagem('Preencha email e senha!', 'red');
+      return;
+    }
+    
+    mostrarMensagem('Verificando...', 'gold');
+    
+    try {
+      // Busca usuário na tabela banco
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/banco?email=eq.${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const usuarios = await response.json();
+      
+      if (usuarios.length === 0) {
+        throw new Error('Email não encontrado!');
+      }
+      
+      const usuario = usuarios[0];
+      if (usuario.senha !== senha) {
+        throw new Error('Senha incorreta!');
+      }
+      
+      // SALVA NO LOCALSTORAGE
+      localStorage.setItem('quantum_user_email', email);
+      localStorage.setItem('quantum_user_senha', senha);
+      localStorage.setItem('quantum_user_data', JSON.stringify(usuario));
+      
+      mostrarMensagem('Login realizado! ✅ Dados salvos no localStorage.', 'lime');
+      
+    } catch (error) {
+      mostrarMensagem('Erro: ' + error.message, 'red');
+    }
+  }
+  
+  function limparCampos() {
+    document.getElementById('emailLogin').value = '';
+    document.getElementById('senhaLogin').value = '';
+    mostrarMensagem('Campos limpos! ✅', 'gold');
+  }
+  
+  function mostrarMensagem(msg, cor = 'gold') {
+    const div = document.getElementById('mensagem');
+    div.textContent = msg;
+    div.style.color = cor;
+  }
+</script>
+
+</body>
+</html>
