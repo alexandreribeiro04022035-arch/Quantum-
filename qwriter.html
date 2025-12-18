@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum</title>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:gold;
+  font-family:Arial,Helvetica,sans-serif;
+  padding:20px;
+}
+h2{
+  text-align:center;
+  text-shadow:0 0 10px gold;
+}
+#status{
+  text-align:center;
+  margin:10px 0;
+}
+#dados{
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Quantum Invest</h2>
+<div id="status"></div>
+<div id="dados"></div>
+
+<script>
+const SUPABASE_URL = "https://lpkhscatjrllfscqmxka.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxwa2hzY2F0anJsbGZzY3FteGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzU3MjYsImV4cCI6MjA3OTE1MTcyNn0.HlNIZFU2kq2-pyq0PgBxFX1Kg1iKldF_Y3thWKzYBnM";
+
+function status(t){
+  document.getElementById("status").textContent = t;
+}
+
+async function main(){
+  const email = localStorage.getItem("quantum_user_email");
+  const senha = localStorage.getItem("quantum_user_senha");
+
+  if(!email || !senha){
+    status("Email ou senha não encontrados no localStorage");
+    return;
+  }
+
+  // mostra email e senha primeiro
+  let texto = "";
+  texto += "email: " + email + "\n";
+  texto += "senha: " + senha + "\n\n";
+  document.getElementById("dados").textContent = texto;
+
+  try{
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/banco?email=eq.${encodeURIComponent(email)}`,
+      {
+        headers:{
+          apikey: SUPABASE_KEY,
+          Authorization: "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
+
+    const j = await r.json();
+    if(!j.length) throw "Usuário não encontrado";
+    if(j[0].senha !== senha) throw "Senha inválida";
+
+    const u = j[0];
+
+    Object.keys(u).forEach(k=>{
+      texto += k + ": " + u[k] + "\n";
+    });
+
+    document.getElementById("dados").textContent = texto;
+    status("Dados carregados");
+
+    // escreve no cache/banco.json
+    await fetch("/cache/banco.json",{
+      method:"PUT",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(u,null,2)
+    });
+
+  }catch(e){
+    status("Erro: " + e);
+  }
+}
+
+main();
+</script>
+
+</body>
+</html>
