@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum JSON Writer</title>
+<style>
+body {
+  background: #000;
+  color: gold;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  margin: 0;
+}
+#dados {
+  white-space: pre-wrap;
+  background: #111;
+  padding: 15px;
+  border: 1px solid gold;
+  border-radius: 5px;
+  margin-top: 20px;
+  font-size: 14px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+#status {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  font-weight: bold;
+}
+.loading { color: #00ff00; }
+.success { color: #00ff00; background: #002200; }
+.error { color: #ff0000; background: #220000; }
+.torre {
+  background: #222;
+  border-left: 5px solid gold;
+  padding: 15px;
+  margin: 10px 0;
+}
+.campo {
+  display: flex;
+  margin: 5px 0;
+}
+.campo label {
+  min-width: 200px;
+  color: #aaa;
+}
+.campo span {
+  color: gold;
+}
+h2 {
+  color: gold;
+  border-bottom: 2px solid gold;
+  padding-bottom: 10px;
+}
+button {
+  background: #222;
+  color: gold;
+  border: 1px solid gold;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+}
+button:hover {
+  background: gold;
+  color: #000;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📁 Quantum JSON Writer</h2>
+<div id="status"></div>
+<button onclick="gerar()">🔁 GERAR E ESCREVER NO banco.json</button>
+
+<div id="torre"></div>
+<div id="dados"></div>
+
+<script>
+// ===== NÃO MUDA NOME DAS VARIÁVEIS =====
+const REPO = "alexandreribeiro04022035-arch/Quantum-";
+const FILE_PATH = "cache/banco.json";
+const TOKEN = "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";
+const JSON_URL = "https://api.github.com/repos/" + REPO + "/contents/" + FILE_PATH;
+
+// ===== SUPABASE =====
+const SUPABASE_URL = "https://lpkhscatjrllfscqmxka.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxwa2hzY2F0anJsbGZzY3FteGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzU3MjYsImV4cCI6MjA3OTE1MTcyNn0.HlNIZFU2kq2-pyq0PgBxFX1Kg1iKldF_Y3thWKzYBnM";
+
+function mostrarStatus(msg, tipo) {
+  const status = document.getElementById("status");
+  status.className = tipo;
+  status.textContent = msg;
+}
+
+function mostrarTorre(usuario) {
+  const torre = document.getElementById("torre");
+  let html = "<div class='torre'>";
+  
+  for (const [chave, valor] of Object.entries(usuario)) {
+    html += `
+      <div class="campo">
+        <label>${chave}:</label>
+        <span>${JSON.stringify(valor)}</span>
+      </div>
+    `;
+  }
+  
+  html += "</div>";
+  torre.innerHTML = html;
+}
+
+async function gerar() {
+  try {
+    mostrarStatus("🔄 Iniciando processo...", "loading");
+    
+    // ===== VERIFICA LOGIN =====
+    const email = localStorage.getItem("quantum_user_email");
+    const senha = localStorage.getItem("quantum_user_senha");
+
+    if (!email || !senha) {
+      mostrarStatus("❌ Login não encontrado no localStorage", "error");
+      return;
+    }
+
+    // ===== BUSCA NA TABELA SUPABASE =====
+    mostrarStatus("📡 Buscando dados da tabela banco...", "loading");
+    
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/banco?email=eq.${encodeURIComponent(email)}`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Erro Supabase: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.length) {
+      mostrarStatus("❌ Usuário não encontrado na tabela", "error");
+      return;
+    }
+
+    const usuario = data[0];
+    
+    // ===== VERIFICA SENHA =====
+    if (usuario.senha !== senha) {
+      mostrarStatus("❌ Senha incorreta", "error");
+      return;
+    }
+
+    // ===== GARANTE TODOS OS CAMPOS =====
+    const modeloCompleto = {
+      id: 0,
+      nome: "",
+      cpf: "",
+      email: "",
+      telefone: "",
+      senha: "",
+      chavepix: "",
+      poupanca: 0,
+      depositar: 0,
+      sacar: 0,
+      mensagem: "",
+      saldo: 0,
+      extratoconta: 0,
+      datadinicio: null,
+      cdb: "",
+      aplicar: 0,
+      resgatar: 0,
+      prazo: 0,
+      carencia: 30,
+      juros: 0.13,
+      rendimento: 0,
+      lucro: 0,
+      extratocdb: 0,
+      datainiciocdb: null,
+      ipo: 50000000,
+      followon: 0,
+      valorunidade: 0.10,
+      tipo: "",
+      comprar: 0,
+      vender: 0,
+      cota: 0,
+      capital: 0,
+      montante: 0,
+      extratoacao: 0,
+      alavanca: 0,
+      datainicioacao: null,
+      limite: 0,
+      cartao: "",
+      credito: 0,
+      debito: 0,
+      fatura: 0,
+      extratocartao: 0,
+      datainiciocartao: null,
+      hitorico: ""
+    };
+
+    // ===== PREENCHE COM DADOS REAIS, MANTENDO TODOS OS CAMPOS =====
+    const dadosCompletos = { ...modeloCompleto, ...usuario };
+    
+    // ===== MOSTRA NA TELA =====
+    mostrarTorre(dadosCompletos);
+    document.getElementById("dados").textContent = JSON.stringify(dadosCompletos, null, 2);
+    
+    // ===== GITHUB GET =====
+    mostrarStatus("🌐 Conectando ao GitHub...", "loading");
+    
+    const getFile = await fetch(JSON_URL, {
+      headers: { "Authorization": "Bearer " + TOKEN }
+    });
+
+    if (!getFile.ok) {
+      throw new Error(`Erro ao buscar arquivo GitHub: ${getFile.status}`);
+    }
+
+    const fileData = await getFile.json();
+
+    // ===== GITHUB PUT =====
+    mostrarStatus("💾 Escrevendo no banco.json...", "loading");
+    
+    const body = {
+      message: "update cache/banco.json",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(dadosCompletos, null, 2)))),
+      sha: fileData.sha
+    };
+
+    const upload = await fetch(JSON_URL, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Bearer " + TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!upload.ok) {
+      throw new Error(`Erro ao salvar no GitHub: ${upload.status}`);
+    }
+
+    mostrarStatus("✅ Dados escritos com SUCESSO no banco.json!", "success");
+
+  } catch (error) {
+    console.error("Erro detalhado:", error);
+    mostrarStatus(`❌ ERRO: ${error.message}`, "error");
+    document.getElementById("dados").textContent = `ERRO: ${error.stack || error.message}`;
+  }
+}
+
+// Executa automaticamente ao carregar
+window.addEventListener('DOMContentLoaded', () => {
+  mostrarStatus("✅ Pronto para gerar JSON. Clique no botão acima.", "success");
+});
+</script>
+
+</body>
+</html>
