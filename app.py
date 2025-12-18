@@ -4,6 +4,7 @@ import os
 from openai import OpenAI
 #chama o gerar py
 from gerar_json import gerar_json
+from gerar_cache import gerar_cache
 
 app = Flask(__name__)
 
@@ -35,9 +36,9 @@ def qwriter():
 
 
 
-@app.route("/gerarjson")
-def  gerarjson():
-    return  send_from_directory("static", "gerarjson.html")
+@app.route("/escritor")
+def  escritor():
+    return  send_from_directory("static", "escritor.html")
 
 
 # =========================
