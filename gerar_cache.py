@@ -1,6 +1,6 @@
 import os, json, requests
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_URL = os.getenv("https://lpkhscatjrllfscqmxka.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 URL = f"{SUPABASE_URL}/rest/v1/banco?select=id,nome,email,saldo,credito,debito"
