@@ -80,7 +80,7 @@ def gerar_json_route():
         return jsonify({"erro": str(e)}), 500
 
 # =========================
-# IA (CORRIGIDA)
+# IA (CORRIGIDA DE VERDADE)
 # =========================
 @app.route("/ia", methods=["POST"])
 def ia():
@@ -101,12 +101,15 @@ Dados da tabela banco:
 {banco}
 """
 
+    # 🔥 CORREÇÃO AQUI
     response = client.responses.create(
         model="gpt-4.1-mini",
-        input=[
-            {"role": "system", "content": contexto},
-            {"role": "user", "content": user_text}
-        ]
+        input=f"""
+{contexto}
+
+Usuário:
+{user_text}
+"""
     )
 
     return jsonify({
