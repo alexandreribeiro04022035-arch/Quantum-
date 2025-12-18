@@ -14,7 +14,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-def gerar_json():
+/*  def gerar_json():
     url = f"{SUPABASE_URL}/rest/v1/{TABLE}?select=*"
 
     r = requests.get(url, headers=headers)
@@ -30,6 +30,33 @@ def gerar_json():
         json.dump(dados, f, ensure_ascii=False, indent=2)
 
     print(f"JSON gerado com sucesso ({len(dados)} registros)")
+*/
+
+
+def gerar_json(email):
+    # filtro por email
+    url = (
+        f"{SUPABASE_URL}/rest/v1/{TABLE}"
+        f"?select=*&email=eq.{email}"
+    )
+
+    r = requests.get(url, headers=headers)
+
+    if r.status_code != 200:
+        raise Exception(f"Erro Supabase: {r.text}")
+
+    dados = r.json()
+
+    os.makedirs("cache", exist_ok=True)
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+    print(f"JSON gerado ({len(dados)} registros) para {email}")
+
+
+
+
 
 if __name__ == "__main__":
     gerar_json()
