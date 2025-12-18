@@ -1,18 +1,45 @@
-from flask import Flask, render_template
+from flask import Flask, request, jsonify, render_template
+import json
+import os
+from openai import OpenAI
 
-app = Flask(__name__, 
-    template_folder="templates",
-    static_folder="static"
+app = Flask(__name__)
+
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
+# rota principal
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# Rota para servir arquivos estáticos (CSS, JS, imagens)
-@app.route("/static/<path:filename>")
-def serve_static(filename):
-    return app.send_static_file(filename)
+# rota da IA
+@app.route("/ia", methods=["POST"])
+def ia():
+    user_text = request.json.get("texto", "")
+
+    # lê o JSON cache
+    with open("cache/banco.json", "r", encoding="utf-8") as f:
+        banco = json.load(f)
+
+    contexto = f"""
+    Você é a IA do sistema Quantum Invest.
+    Estes são os dados disponíveis da tabela banco:
+    {banco}
+    """
+
+    resposta = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": contexto},
+            {"role": "user", "content": user_text}
+        ]
+    )
+
+    return jsonify({
+        "resposta": resposta.choices[0].message.content
+    })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run()
