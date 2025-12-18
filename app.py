@@ -34,10 +34,9 @@ def qwriter():
 
 
 
-@app.route("/gerar-json", methods=["GET", "POST"])
-def rota_gerar_json():
-    gerar_json()
-    return jsonify({"status": "ok", "msg": "cache atualizado"})
+@app.route("/gerarjson", methods=["GET", "POST"])
+def  gerarjson():
+    return  send_from_directory("static", "gerarjson.py")
 
 
 # =========================
