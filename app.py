@@ -2,32 +2,53 @@ from flask import Flask, request, jsonify, render_template
 import json
 import os
 from openai import OpenAI
+from gerar_json import gerar_json
 
 app = Flask(__name__)
 
+# OpenAI
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-# rota principal
+# =========================
+# INDEX
+# =========================
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# rota da IA
+
+# =========================
+# GERAR CACHE
+# =========================
+@app.route("/gerar-json", methods=["GET", "POST"])
+def rota_gerar_json():
+    gerar_json()
+    return jsonify({"status": "ok", "msg": "cache atualizado"})
+
+
+# =========================
+# IA
+# =========================
 @app.route("/ia", methods=["POST"])
 def ia():
     user_text = request.json.get("texto", "")
 
-    # lê o JSON cache
-    with open("cache/banco.json", "r", encoding="utf-8") as f:
+    cache_path = "cache/banco.json"
+
+    if not os.path.exists(cache_path):
+        return jsonify({"erro": "cache não existe"}), 400
+
+    with open(cache_path, "r", encoding="utf-8") as f:
         banco = json.load(f)
 
     contexto = f"""
-    Você é a IA do sistema Quantum Invest.
-    Estes são os dados disponíveis da tabela banco:
-    {banco}
-    """
+Você é a IA do sistema Quantum Invest.
+Use APENAS os dados abaixo da tabela banco.
+Dados:
+{banco}
+"""
 
     resposta = client.chat.completions.create(
         model="gpt-4.1-mini",
@@ -40,14 +61,6 @@ def ia():
     return jsonify({
         "resposta": resposta.choices[0].message.content
     })
-
-from gerar_json import gerar_json
-
-@app.route("/gerar-json", methods=["GET"])
-def rota_gerar_json():
-    gerar_json()
-    return {"status": "ok"}
-
 
 
 if __name__ == "__main__":
