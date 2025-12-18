@@ -28,6 +28,12 @@ def login():
 # =========================
 # GERAR CACHE
 # =========================
+@app.route("/qwriter")
+def qwriter():
+    return send_from_directory(".", "qwriter.html")
+
+
+
 @app.route("/gerar-json", methods=["GET", "POST"])
 def rota_gerar_json():
     gerar_json()
