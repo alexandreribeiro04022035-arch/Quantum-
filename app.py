@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import json
 import os
 from openai import OpenAI
+#chama o gerar py
 from gerar_json import gerar_json
 
 app = Flask(__name__)
