@@ -26,9 +26,9 @@ def login():
 def qwriter():
     return send_from_directory("static", "qwriter.html")
 
-@app.route("/gerarjson")
-def gerarjson():
-    return send_from_directory("static", "gerarjson.html")
+@app.route("/escritor")
+def escritor():
+    return send_from_directory("static", "escritor.html")
 
 # =========================
 # ÚNICA ROTA DA IA - LÊ TUDO
