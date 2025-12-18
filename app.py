@@ -29,12 +29,15 @@ def login():
 
 # =========================
 # qwriter 
-# =========================
+
 @app.route("/qwriter")
 def qwriter():
     return send_from_directory("static","qwriter.html")
 
-
+@app.route("/writejson")
+def writejson():
+    return send_from_directory("cache","writejson.html")
+    
 
 @app.route("/escritor")
 def  escritor():
@@ -48,7 +51,7 @@ def  escritor():
 def ia():
     user_text = request.json.get("texto", "")
 
-    cache_path = "static/banco.json"
+    cache_path = "cache/banco.json"
 
     if not os.path.exists(cache_path):
         return jsonify({"erro": "static não existe"}), 400
@@ -57,8 +60,7 @@ def ia():
         banco = json.load(f)
 
     contexto = f"""
-Você é a IA do sistema Quantum Invest.
-Use APENAS os dados abaixo da tabela banco.
+Tu és IA do sistema Quantum .
 Dados:
 {banco}
 """
