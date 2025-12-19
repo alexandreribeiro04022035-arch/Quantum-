@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mini Writer OWNER</title>
+<style>
+body {
+  background:#000;
+  color:#0f0;
+  font-family: monospace;
+  padding:20px;
+}
+button {
+  padding:10px 20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+pre {
+  background:#111;
+  padding:15px;
+  margin-top:15px;
+  max-height:400px;
+  overflow:auto;
+  border:1px solid #0f0;
+}
+</style>
+</head>
+
+<body>
+
+<h2>👑 Mini Writer OWNER – GitHub Repo</h2>
+<button onclick="gerar()">✍️ ESCREVER NO cache/ia-registro.json</button>
+
+<pre id="log"></pre>
+
+<script>
+// ===== VARIÁVEIS OWNER (NÃO MUDAR) =====
+const OWNER = "alexandreribeiro04022035-arch";
+const REPO = "Quantum-";
+const FILE_PATH = "cache/ia-registro.json";
+const TOKEN = "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";
+
+// URL OWNER DIRETA
+const JSON_URL =
+  "https://api.github.com/repos/" +
+  OWNER + "/" +
+  REPO +
+  "/contents/" +
+  FILE_PATH;
+
+const log = msg => {
+  document.getElementById("log").textContent += msg + "\n";
+};
+
+async function gerar() {
+  try {
+    log("🔄 Iniciando writer OWNER...");
+
+    // ===== LOCALSTORAGE =====
+    const email = localStorage.getItem("quantum_user_email");
+    const senha = localStorage.getItem("quantum_user_senha");
+
+    if (!email || !senha) {
+      throw new Error("Email ou senha não encontrados no localStorage");
+    }
+
+    // ===== GET ARQUIVO =====
+    log("🌐 GET cache/ia-registro.json");
+    const getFile = await fetch(JSON_URL, {
+      headers: {
+        Authorization: "Bearer " + TOKEN,
+        Accept: "application/vnd.github+json"
+      }
+    });
+
+    if (!getFile.ok) {
+      throw new Error("GitHub GET falhou: " + getFile.status);
+    }
+
+    const fileData = await getFile.json();
+    const lista = JSON.parse(atob(fileData.content));
+
+    // ===== NOVO ID =====
+    const lastId = lista.length
+      ? Math.max(...lista.map(r => r.id || 0))
+      : 0;
+
+    // ===== REGISTRO =====
+    const registro = {
+      id: lastId + 1,
+      nome: "",
+      email: email,
+      senha: senha,
+      telefone: "",
+      saldo: 0,
+      chavepix: "",
+      data: new Date().toISOString()
+    };
+
+    lista.push(registro);
+
+    log("✍️ Novo registro ID: " + registro.id);
+
+    // ===== PUT =====
+    const body = {
+      message: "owner add ia-registro",
+      content: btoa(
+        unescape(
+          encodeURIComponent(JSON.stringify(lista, null, 2))
+        )
+      ),
+      sha: fileData.sha
+    };
+
+    const putFile = await fetch(JSON_URL, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + TOKEN,
+        "Content-Type": "application/json",
+        Accept: "application/vnd.github+json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!putFile.ok) {
+      throw new Error("GitHub PUT falhou: " + putFile.status);
+    }
+
+    log("✅ OWNER WRITE OK");
+    log(JSON.stringify(registro, null, 2));
+
+  } catch (err) {
+    log("❌ ERRO: " + err.message);
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
