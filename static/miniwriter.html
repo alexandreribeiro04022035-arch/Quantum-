@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mini Writer – Teste Cache</title>
+<style>
+body {
+  background:#000;
+  color:#0f0;
+  font-family: monospace;
+  padding:20px;
+}
+button {
+  padding:10px 20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+pre {
+  background:#111;
+  padding:15px;
+  margin-top:15px;
+  max-height:400px;
+  overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🧪 Mini Writer – cache/ia-registro.json</h2>
+<button onclick="gerar()">✍️ ESCREVER REGISTRO</button>
+
+<pre id="log"></pre>
+
+<script>
+// ===== NÃO MUDA NOMES =====
+const REPO = "alexandreribeiro04022035-arch/Quantum-";
+const FILE_PATH = "cache/ia-registro.json";
+const TOKEN = "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";
+
+const JSON_URL = "https://api.github.com/repos/" + REPO + "/contents/" + FILE_PATH;
+
+const log = msg => {
+  document.getElementById("log").textContent += msg + "\n";
+};
+
+async function gerar() {
+  try {
+    log("🔄 Iniciando...");
+
+    // ===== LOCALSTORAGE =====
+    const email = localStorage.getItem("quantum_user_email");
+    const senha = localStorage.getItem("quantum_user_senha");
+
+    if (!email || !senha) {
+      throw new Error("Login não encontrado no localStorage");
+    }
+
+    // ===== GITHUB GET =====
+    log("🌐 Buscando arquivo no GitHub...");
+    const getFile = await fetch(JSON_URL, {
+      headers: { Authorization: "Bearer " + TOKEN }
+    });
+
+    if (!getFile.ok) {
+      throw new Error("Erro GitHub GET: " + getFile.status);
+    }
+
+    const fileData = await getFile.json();
+    const conteudo = JSON.parse(atob(fileData.content));
+
+    // ===== NOVO ID =====
+    const lastId = conteudo.length
+      ? Math.max(...conteudo.map(r => r.id || 0))
+      : 0;
+
+    // ===== NOVO REGISTRO =====
+    const novoRegistro = {
+      id: lastId + 1,
+      nome: "",
+      email: email,
+      senha: senha,
+      telefone: "",
+      saldo: 0,
+      chavepix: "",
+      data: new Date().toISOString()
+    };
+
+    conteudo.push(novoRegistro);
+
+    log("✍️ Criando registro ID " + novoRegistro.id);
+
+    // ===== GITHUB PUT =====
+    const body = {
+      message: "add ia-registro",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(conteudo, null, 2)))),
+      sha: fileData.sha
+    };
+
+    const put = await fetch(JSON_URL, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!put.ok) {
+      throw new Error("Erro GitHub PUT: " + put.status);
+    }
+
+    log("✅ SUCESSO! Registro gravado.");
+    log(JSON.stringify(novoRegistro, null, 2));
+
+  } catch (e) {
+    log("❌ ERRO: " + e.message);
+    console.error(e);
+  }
+}
+</script>
+
+</body>
+</html>
