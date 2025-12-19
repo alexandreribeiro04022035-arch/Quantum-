@@ -41,6 +41,15 @@ def escritor():
 def writejson():
     return send_from_directory("cache", "writejson.html")
 
+@app.route("/miniwriter")
+def miniwriter():
+    return send_from_directory("static", "miniwriter.html")
+
+@app.route("/writer-owner")
+def writer-owner():
+    return send_from_directory("static", "writer-owner.html")
+
+
 # =========================
 # GERAR CACHE (PROTEGIDO)
 # =========================
